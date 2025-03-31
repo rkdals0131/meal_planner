@@ -424,6 +424,54 @@ class MealPlanner:
             return True
         return False
     
+    def view_meal_plans(self, start_date, end_date):
+        """특정 기간의 식단 일정을 조회합니다."""
+        if not self.service or not self.calendar_id:
+            print("오류: 서비스 또는 캘린더 ID가 유효하지 않아 일정을 조회할 수 없습니다.")
+            return []
+        
+        # 시간대 객체 생성
+        try:
+            tz = ZoneInfo(self.timezone)
+        except ZoneInfoNotFoundError:
+            print(f"오류: 알 수 없는 시간대 '{self.timezone}'. 올바른 시간대 이름을 사용하세요.")
+            return []
+        
+        # 시작일과 종료일 설정
+        start_datetime = datetime.datetime.combine(start_date, datetime.time.min, tzinfo=tz)
+        end_datetime = datetime.datetime.combine(end_date, datetime.time.max, tzinfo=tz)
+        
+        # API 호출 형식으로 변환
+        time_min = start_datetime.isoformat()
+        time_max = end_datetime.isoformat()
+        
+        try:
+            events_result = self.service.events().list(
+                calendarId=self.calendar_id,
+                timeMin=time_min,
+                timeMax=time_max,
+                singleEvents=True,
+                orderBy='startTime'
+            ).execute()
+            
+            events = events_result.get('items', [])
+            
+            # 식단 관련 이벤트만 필터링
+            meal_events = []
+            for event in events:
+                summary = event.get('summary', '')
+                if any(meal_type in summary for meal_type in self.meal_times.keys()):
+                    meal_events.append(event)
+            
+            return meal_events
+            
+        except HttpError as error:
+            print(f"일정 조회 중 오류 발생: {error}")
+            return []
+        except Exception as e:
+            print(f"일정 조회 중 알 수 없는 오류: {e}")
+            return []
+    
     def initialize(self):
         """서비스 초기화 및 필요한 설정 확인"""
         if not self.service:

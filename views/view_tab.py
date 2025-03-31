@@ -62,13 +62,13 @@ class ViewTab(ctk.CTkFrame):
         result_frame.grid_columnconfigure(0, weight=1)
         result_frame.grid_rowconfigure(0, weight=1)
         
-        # 결과 텍스트
-        result_scroll = ctk.CTkScrollableFrame(result_frame, width=800, height=300)
-        result_scroll.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        
-        self.result_text = ctk.CTkTextbox(result_scroll, width=780, height=290, wrap="word")
-        self.result_text.pack(fill="both", expand=True)
+        # 결과 텍스트 위젯 (스크롤바 포함)
+        self.result_text = ctk.CTkTextbox(result_frame, wrap="word")
+        self.result_text.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.result_text.configure(state="disabled")
+        
+        # 결과 프레임이 늘어날 수 있도록 행 가중치 설정
+        main_frame.grid_rowconfigure(4, weight=1)
     
     def setup_period_options(self):
         """기간별 조회 옵션 설정"""
