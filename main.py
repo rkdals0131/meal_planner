@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import os
 import sys
-from meal_planner_gui import MealPlannerGUI
+from views import MealPlannerGUI
 
 def main():
     """메인 함수: 식단 플래너 애플리케이션 실행"""
