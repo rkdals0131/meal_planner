@@ -19,6 +19,8 @@ Google Calendar와 연동되는 식단 플래너 애플리케이션입니다. �
 pip install google-auth-oauthlib google-auth-httplib2 google-api-python-client tzdata customtkinter tkcalendar
 ```
 
+**중요**: `tkcalendar` 패키지가 반드시 설치되어 있어야 날짜 선택 기능이 동작합니다.
+
 ### Google Calendar API 설정
 
 1. [Google Cloud Platform](https://console.cloud.google.com/) 에서 프로젝트를 생성합니다.
@@ -43,6 +45,10 @@ pip install pyinstaller
 ```
 
 ### EXE 파일 생성
+
+Windows 환경에서는 제공된 `build_exe.bat` 파일을 실행하면 됩니다.
+
+또는 수동으로 다음 명령을 실행할 수 있습니다:
 
 ```bash
 pyinstaller --onefile --windowed --icon=icon.ico --name="식단플래너" --add-data "client_secret.json;." main.py
@@ -79,12 +85,21 @@ pyinstaller --onefile --windowed --icon=icon.ico --name="식단플래너" --add-
 - 인증 오류: `token.json` 파일을 삭제하고 재실행하여 다시 인증하세요.
 - 캘린더를 찾을 수 없음: Google Calendar에 '식단' 이름의 캘린더가 있는지 확인하세요.
 - 일정이 추가되지 않음: 인터넷 연결 및 캘린더 권한을 확인하세요.
+- UI 관련 오류: 필요한 패키지(`customtkinter`, `tkcalendar`)가 설치되어 있는지 확인하세요.
 
 ## 개발 정보
 
 - 프로그래밍 언어: Python 3.9 이상
 - 주요 라이브러리: Google Calendar API, CustomTkinter, tkcalendar
 - 개발 구조: 
-  - `meal_planner_core.py`: 핵심 기능
-  - `meal_planner_gui.py`: GUI 구현
-  - `main.py`: 메인 실행 파일 
+  - `meal_planner_core.py`: 백엔드 핵심 기능 및 Google Calendar API 연동
+  - `meal_planner_gui.py`: UI 테마 설정 및 메인 창 로드
+  - `main.py`: 메인 실행 파일
+  - `views/`: 모듈화된 UI 컴포넌트 (탭별 클래스 구현)
+    - `main_window.py`: 메인 UI 창 및 공통 함수
+    - `single_date_tab.py`: 단일 날짜 식단 추가 탭
+    - `multi_date_tab.py`: 여러 날짜 식단 추가 탭
+    - `recurring_tab.py`: 반복 식단 추가 탭
+    - `view_tab.py`: 식단 조회 탭
+    - `template_tab.py`: 템플릿 관리 탭
+    - `setting_tab.py`: 설정 탭 
