@@ -189,6 +189,14 @@ class MealPlanner:
             return list(templates.keys())
         return []
     
+    def load_templates(self):
+        """저장된 모든 템플릿을 반환합니다. (호환성 유지 용도)"""
+        return self.load_meal_template()
+    
+    def save_template(self, template_name, meal_plan):
+        """템플릿을 저장합니다. (호환성 유지 용도)"""
+        return self.save_meal_template(template_name, meal_plan)
+    
     def delete_template(self, template_name):
         """템플릿 삭제"""
         templates_file = 'meal_templates.json'
@@ -403,28 +411,18 @@ class MealPlanner:
         return True
     
     def update_meal_time(self, meal_type, hour, minute):
-        """식사 시간 설정 업데이트"""
-        if meal_type not in self.meal_times:
-            print(f"'{meal_type}'은(는) 유효한 식사 유형이 아닙니다.")
-            return False
-        
-        if 0 <= hour < 24 and 0 <= minute < 60:
+        """특정 식사 시간 업데이트"""
+        if meal_type in self.meal_times:
             self.meal_times[meal_type] = (hour, minute)
-            print(f"{meal_type} 시간이 {hour:02d}:{minute:02d}로 변경되었습니다.")
             return True
-        else:
-            print("올바른 시간 형식이 아닙니다.")
-            return False
+        return False
     
-    def update_event_duration(self, duration):
-        """식사 기간 설정 업데이트"""
-        if duration > 0:
-            self.event_duration_hours = duration
-            print(f"식사 기간이 {self.event_duration_hours}시간으로 변경되었습니다.")
+    def update_event_duration(self, hours):
+        """이벤트 지속 시간 업데이트"""
+        if hours > 0:
+            self.event_duration_hours = hours
             return True
-        else:
-            print("식사 기간은 0보다 커야 합니다.")
-            return False
+        return False
     
     def initialize(self):
         """서비스 초기화 및 필요한 설정 확인"""

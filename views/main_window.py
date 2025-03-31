@@ -7,7 +7,7 @@ from datetime import date
 import os
 from tkcalendar import Calendar
 
-from ..meal_planner_core import MealPlanner
+from meal_planner_core import MealPlanner
 from .single_date_tab import SingleDateTab
 from .multi_date_tab import MultiDateTab
 from .recurring_tab import RecurringTab
@@ -56,7 +56,8 @@ class MealPlannerGUI(ctk.CTk):
             'add_recurring_meal_thread': self.add_recurring_meal_thread,
             'load_templates': self.load_templates,
             'change_theme': self.change_theme,
-            'open_url': self.open_url
+            'open_url': self.open_url,
+            'get_current_theme': self.get_current_theme
         }
         
         # UI 요소 생성

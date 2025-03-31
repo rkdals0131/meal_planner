@@ -37,8 +37,8 @@ class SettingTab(ctk.CTkFrame):
         # 식사 시간 입력 필드
         self.time_entries = {}
         
-        for i, (meal_type, time_str) in enumerate(self.planner_core.meal_times.items(), start=2):
-            hour, minute = map(int, time_str.split(':'))
+        for i, (meal_type, time_tuple) in enumerate(self.planner_core.meal_times.items(), start=2):
+            hour, minute = time_tuple  # 튜플에서 직접 시간과 분을 가져옴
             
             meal_label = ctk.CTkLabel(meal_time_frame, text=f"{meal_type}:", width=80, anchor="w")
             meal_label.grid(row=i, column=0, padx=10, pady=8, sticky="w")
@@ -80,10 +80,10 @@ class SettingTab(ctk.CTkFrame):
         event_label.grid(row=0, column=0, columnspan=2, pady=10, sticky="w")
         
         # 이벤트 지속 시간
-        duration_label = ctk.CTkLabel(event_frame, text="이벤트 지속 시간(분):")
+        duration_label = ctk.CTkLabel(event_frame, text="이벤트 지속 시간(시간):")
         duration_label.grid(row=1, column=0, padx=10, pady=8, sticky="w")
         
-        self.duration_var = tk.StringVar(value=str(self.planner_core.event_duration))
+        self.duration_var = tk.StringVar(value=str(self.planner_core.event_duration_hours))
         duration_entry = ctk.CTkEntry(event_frame, width=100, textvariable=self.duration_var)
         duration_entry.grid(row=1, column=1, padx=10, pady=8, sticky="w")
         
@@ -153,20 +153,21 @@ class SettingTab(ctk.CTkFrame):
                     messagebox.showwarning("입력 오류", f"{meal_type} 시간이 올바르지 않습니다.")
                     return
                 
-                time_str = f"{hour:02d}:{minute:02d}"
-                new_meal_times[meal_type] = time_str
+                # 튜플로 저장
+                new_meal_times[meal_type] = (hour, minute)
                 
             except ValueError:
                 messagebox.showwarning("입력 오류", f"{meal_type} 시간이 올바르지 않습니다.")
                 return
         
         # 백엔드에 저장
-        success = self.planner_core.update_meal_times(new_meal_times)
+        for meal_type, time_tuple in new_meal_times.items():
+            success = self.planner_core.update_meal_time(meal_type, time_tuple[0], time_tuple[1])
+            if not success:
+                messagebox.showerror("오류", f"{meal_type} 시간 설정 저장에 실패했습니다.")
+                return
         
-        if success:
-            messagebox.showinfo("완료", "식사 시간 설정이 저장되었습니다.")
-        else:
-            messagebox.showerror("오류", "설정 저장에 실패했습니다.")
+        messagebox.showinfo("완료", "식사 시간 설정이 저장되었습니다.")
     
     def save_event_duration(self, duration_entry, label_widget):
         """이벤트 지속 시간 저장"""
@@ -196,7 +197,7 @@ class SettingTab(ctk.CTkFrame):
             
             if duration > 0:
                 example_time = datetime.datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
-                end_time = example_time + datetime.timedelta(minutes=duration)
+                end_time = example_time + datetime.timedelta(hours=duration)
                 
                 description = (f"예시: 점심 12:00에 식단 추가 시 "
                               f"12:00 ~ {end_time.strftime('%H:%M')} 일정으로 등록")
