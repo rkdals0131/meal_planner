@@ -5,6 +5,7 @@ import threading
 import datetime
 from datetime import date
 import os
+from tkcalendar import Calendar
 
 from ..meal_planner_core import MealPlanner
 from .single_date_tab import SingleDateTab
